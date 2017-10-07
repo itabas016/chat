@@ -27,7 +27,7 @@ NAME='My Chat'
 MAX_CONNECTIONS=50
 
 # run
-pyton ~/chat/server.py
+python ~/chat/server.py
 ```
 
 #### Features ####
@@ -35,7 +35,9 @@ pyton ~/chat/server.py
 A complete workflow contains:
 
 > login -> check unique nick name -> login successfule
+
 > chatroom -> add/remove/say/look/who _PS. server will push message for each command._
+
 > logout
 
 ### Client ###
@@ -43,6 +45,6 @@ A complete workflow contains:
 #### Usage ####
 
 ```bash
-pyton ~/chat/client.py
+python ~/chat/client.py
 
 ```
