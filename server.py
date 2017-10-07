@@ -5,9 +5,8 @@
 from asyncore import dispatcher
 from asynchat import async_chat
 import socket, asyncore
-
-PORT = 5005
-NAME = 'TestChat'
+import sys
+import config as cfg
 
 class EndSession(Exception): pass
 
@@ -161,10 +160,10 @@ class ChatSession(async_chat):
     def enter(self, room):
         # Remove self from current room and add self to
         # next room...
+        self.room = room
         try: cur = self.room
         except AttributeError: pass
         else: cur.remove(self)
-        self.room = room
         room.add(self)
 
     def collect_incoming_data(self, data):
@@ -186,21 +185,31 @@ class ChatServer(dispatcher):
     A chat server with a single room.
     """
 
-    def __init__(self, port, name):
+    def __init__(self, host, port, name):
         dispatcher.__init__(self)
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         self.set_reuse_addr()
-        self.bind(('', port))
-        self.listen(5)
+        address = (host, port)
+        self.bind(address)
+        print('started a chat server %s' % repr(address))
+        self.listen(cfg.MAX_CONNECTIONS)
         self.name = name
         self.users = {}
         self.main_room = ChatRoom(self)
 
     def handle_accept(self):
+        print('waiting for connection...')
         conn, addr = self.accept()
+        print('accepted new connection, [+] client: %s' % repr(addr))
         ChatSession(self, conn)
 
-if __name__ == '__main__':
-    s = ChatServer(PORT, NAME)
+
+def main():
+    s = ChatServer(cfg.HOST, cfg.PORT, cfg.NAME)
     try: asyncore.loop()
-    except KeyboardInterrupt: print
+    except KeyboardInterrupt: 
+        sys.exit('\nUser cancelled')
+
+if __name__ == '__main__':
+    main()
+    
